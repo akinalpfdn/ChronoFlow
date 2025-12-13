@@ -7,11 +7,14 @@
 
 import SwiftUI
 
+// Ensure your App entry point points here
 @main
 struct ChronoFlowApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ChronoFlowMainView()
+                // Force dark mode for the high-contrast look
+                .preferredColorScheme(.dark)
         }
     }
 }
