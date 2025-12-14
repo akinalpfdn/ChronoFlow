@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ChronoFlowMainView: View {
     @StateObject private var viewModel = TimerViewModel()
+    @State private var isSelectionActive = false
     
     var body: some View {
         ZStack {
@@ -11,21 +12,29 @@ struct ChronoFlowMainView: View {
             // 2. Liquid Physics Background
             LiquidBackgroundView(progress: $viewModel.progress, color: viewModel.currentThemeColor)
                 .ignoresSafeArea()
+                .opacity(isSelectionActive ? 0.3 : 1.0) // Dim liquid when selecting
+                .animation(.easeInOut, value: isSelectionActive)
             
             // 3. Floating Interface
             VStack {
                 Spacer()
                 
-                // NATIVE API: Text with glass material
-                Text(viewModel.timeFormatted)
-                    .font(.system(size: 130, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .contentTransition(.numericText())
+                // Combined Time Display + Selector
+                GearTimeSelector(
+                    totalTime: Binding(
+                        get: { viewModel.totalTime },
+                        set: { viewModel.updateTotalTime($0) }
+                    ),
+                    isSelectionActive: $isSelectionActive
+                )
                 
-                Text(viewModel.statusText)
-                    .font(.caption)
-                    .tracking(8)
-                    .foregroundStyle(.secondary)
+                if !isSelectionActive {
+                    Text(viewModel.statusText)
+                        .font(.caption)
+                        .tracking(8)
+                        .foregroundStyle(.secondary)
+                        .transition(.opacity)
+                }
                 
                 Spacer()
                 
@@ -33,14 +42,14 @@ struct ChronoFlowMainView: View {
                 HStack(spacing: 60) {
                     Button(action: viewModel.resetTimer) {
                         Image(systemName: "arrow.counterclockwise")
-                            .font(.title2)
+                        .font(.title2)
                     }
                     .buttonStyle(.glass) // Native iOS 26 style
                     
                     Button(action: viewModel.toggleTimer) {
                         Image(systemName: viewModel.isRunning ? "pause.fill" : "play.fill")
-                            .font(.largeTitle)
-                            .frame(width: 80, height: 80)
+                        .font(.largeTitle)
+                        .frame(width: 80, height: 80)
                     }
                     .buttonStyle(.glassProminent) // Native "Prominent" glass style
                 }

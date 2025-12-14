@@ -19,8 +19,19 @@ class TimerViewModel: ObservableObject {
     }
     
     private var timer: Timer?
-    private var totalTime: Double = 30
+    var totalTime: Double = 30 // Made internal for binding access
     private var currentTime: Double = 30
+    
+    // Updates formatting when totalTime is manually changed
+    func updateTotalTime(_ newTime: Double) {
+        totalTime = newTime
+        currentTime = newTime
+        // Recalculate display
+        let m = Int(currentTime) / 60
+        let s = Int(currentTime) % 60
+        timeFormatted = String(format: "%02d:%02d", m, s)
+        progress = 0.0 // Reset progress
+    }
     
     func toggleTimer() {
         isRunning.toggle()
