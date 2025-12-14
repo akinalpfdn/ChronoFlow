@@ -82,11 +82,18 @@ struct SingleGear: View {
     
     @State private var rotation: Double = 0
     @State private var isDragging: Bool = false
+    @State private var lastHapticValue: Int = 0 // Track for haptics
+    
+    // Haptic Feedback
+    private let selectionFeedback = UISelectionFeedbackGenerator()
     
     // Computed property to center the coordinate system for drag math
     private var center: CGPoint {
         CGPoint(x: radius + 30, y: radius + 30)
     }
+    
+    // Haptics
+    private let impactFeedback = UIImpactFeedbackGenerator(style: .light)
     
     var body: some View {
         ZStack {
@@ -154,6 +161,17 @@ struct SingleGear: View {
                     // Map to value
                     let newValue = (normalizedAngle / 360.0) * totalRange
                     value = min(max(0, newValue), totalRange)
+                    
+                    // Haptic Feedback Logic
+                    let intValue = Int(value)
+                    if intValue != lastHapticValue {
+                        lastHapticValue = intValue
+                        if intValue % 5 == 0 {
+                            impactFeedback.impactOccurred(intensity: 1.0) // Stronger click for 5, 10, 15...
+                        } else {
+                            impactFeedback.impactOccurred(intensity: 0.5) // Light click for 1, 2, 3...
+                        }
+                    }
                 }
                 .onEnded { _ in
                     isDragging = false
