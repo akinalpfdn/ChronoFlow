@@ -55,22 +55,7 @@ class TimerViewModel: ObservableObject {
     }
     
     private func updateDrops() {
-        // 1. Move Drops
-        for i in activeDrops.indices { activeDrops[i].y += 8 }
-        
-        // 2. Remove drops that merged into the pool
-        let threshold = UIScreen.main.bounds.height * (1.0 - CGFloat(progress))
-        // In iOS 26, visual merging is automatic, we just clean up the data
-        activeDrops.removeAll { $0.y > threshold + 30 }
-        
-        // 3. Spawn Drops
-        if isRunning && progress < 0.95 && Double.random(in: 0...1) > 0.92 {
-            let w = UIScreen.main.bounds.width
-            activeDrops.append(LiquidDrop(
-                x: CGFloat.random(in: 20...w-20),
-                y: -40,
-                size: CGFloat.random(in: 15...35)
-            ))
-        }
+        // Old simulation logic removed.
+        // Physics are now handled by LiquidGameScene in Visuals/LiquidPhysics.swift
     }
 }
