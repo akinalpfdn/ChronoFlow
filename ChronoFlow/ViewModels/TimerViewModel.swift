@@ -20,7 +20,7 @@ class TimerViewModel: ObservableObject {
     
     private var timer: Timer?
     var totalTime: Double = 30 // Made internal for binding access
-    private var currentTime: Double = 30
+    @Published var currentTime: Double = 30 // Published for UI binding
     
     // Updates formatting when totalTime is manually changed
     func updateTotalTime(_ newTime: Double) {

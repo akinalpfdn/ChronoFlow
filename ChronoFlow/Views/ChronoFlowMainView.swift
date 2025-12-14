@@ -22,8 +22,8 @@ struct ChronoFlowMainView: View {
                 // Combined Time Display + Selector
                 GearTimeSelector(
                     totalTime: Binding(
-                        get: { viewModel.totalTime },
-                        set: { viewModel.updateTotalTime($0) }
+                        get: { viewModel.currentTime }, // Read current time for animation
+                        set: { viewModel.updateTotalTime($0) } // Set total time on interaction
                     ),
                     isSelectionActive: $isSelectionActive
                 )

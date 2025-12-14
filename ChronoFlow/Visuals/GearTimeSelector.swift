@@ -122,8 +122,14 @@ struct SingleGear: View {
                 .rotationEffect(.degrees(rotation))
                 .opacity(0.3)
         }
-        // Touch Area
-        .contentShape(Circle().inset(by: -20).stroke(lineWidth: 40)) // Don't block center
+        // Touch Area: Strictly defined ring at radius
+        // Frame is radius*2 + 60 -> "Radius" of view is r+30.
+        // We want ring at `radius`. Indent = 30.
+        .contentShape(
+             Circle()
+                .inset(by: 30) // Moves from edge (r+30) to (r)
+                .stroke(lineWidth: 40) // Clickable area width
+        )
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { gesture in
