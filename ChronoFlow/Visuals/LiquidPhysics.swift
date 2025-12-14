@@ -8,7 +8,7 @@ class LiquidGameScene: SKScene {
     // Reduced count slightly from sample to ensure stability, but high enough for good liquid
     static let maxBalls = 600
     // Radius for the physics body
-    static let circleRadius = 8.0
+    static let circleRadius = 15.0
     
     var motionManager: CMMotionManager?
     var nodes = [SKNode]()
@@ -31,6 +31,9 @@ class LiquidGameScene: SKScene {
         physicsBody = SKPhysicsBody(edgeLoopFrom: boundaryFrame)
         physicsBody?.friction = 0.0
         physicsBody?.restitution = 0.0 // No bounce, maximizes fluid feel
+        
+        // Default Gravity
+        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         
         motionManager = CMMotionManager()
         motionManager?.startAccelerometerUpdates()
@@ -79,7 +82,8 @@ class LiquidGameScene: SKScene {
         ball.physicsBody = SKPhysicsBody(circleOfRadius: Self.circleRadius)
         ball.physicsBody?.friction = 0.0
         ball.physicsBody?.restitution = 0.0
-        ball.physicsBody?.linearDamping = 0.1
+        ball.physicsBody?.linearDamping = 0.0 // Flow like water (was 0.1)
+        ball.physicsBody?.angularDamping = 0.0
         ball.physicsBody?.density = 1.0
         
         addChild(ball)
@@ -148,8 +152,11 @@ struct LiquidBackgroundView: View {
                             let y = size.height - p.y
                             let x = p.x
                             
-                            let r = LiquidGameScene.circleRadius
-                            let rect = CGRect(x: x - r, y: y - r, width: r * 2, height: r * 2)
+                            // Visual Trick: Draw larger than physics body to close gaps
+                            let rPhysics = LiquidGameScene.circleRadius
+                            let rVisual = rPhysics * 1.3
+                            
+                            let rect = CGRect(x: x - rVisual, y: y - rVisual, width: rVisual * 2, height: rVisual * 2)
                             
                             layerCtx.fill(Circle().path(in: rect), with: .color(.white))
                         }
