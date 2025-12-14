@@ -19,8 +19,8 @@ class TimerViewModel: ObservableObject {
     }
     
     private var timer: Timer?
-    private var totalTime: Double = 300
-    private var currentTime: Double = 300
+    private var totalTime: Double = 30
+    private var currentTime: Double = 30
     
     func toggleTimer() {
         isRunning.toggle()

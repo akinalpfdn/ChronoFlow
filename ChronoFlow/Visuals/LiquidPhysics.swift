@@ -5,8 +5,10 @@ import CoreMotion
 // MARK: - Physics Scene
 
 class LiquidGameScene: SKScene {
-    static let circleRadius = 7.0 // Slightly smaller for finer liquid
-    static let maxBalls = 1500 // Increased count for smoother look
+    // Reduced count slightly from sample to ensure stability, but high enough for good liquid
+    static let maxBalls = 600
+    // Radius for the physics body
+    static let circleRadius = 8.0
     
     var motionManager: CMMotionManager?
     var nodes = [SKNode]()
@@ -16,6 +18,7 @@ class LiquidGameScene: SKScene {
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
+        view.allowsTransparency = true
         
         // Define boundaries
         // We extend the top effectively infinitely so balls can fall from "above"
@@ -26,8 +29,8 @@ class LiquidGameScene: SKScene {
             height: frame.height + 2000
         )
         physicsBody = SKPhysicsBody(edgeLoopFrom: boundaryFrame)
-        physicsBody?.friction = 0.1
-        physicsBody?.restitution = 0.1 // Low bounce for water-like feel
+        physicsBody?.friction = 0.0
+        physicsBody?.restitution = 0.0 // No bounce, maximizes fluid feel
         
         motionManager = CMMotionManager()
         motionManager?.startAccelerometerUpdates()
@@ -36,28 +39,23 @@ class LiquidGameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         // 1. Update Gravity from Gyro
         if let data = motionManager?.accelerometerData {
-            physicsWorld.gravity = CGVector(dx: data.acceleration.x * 20, dy: data.acceleration.y * 20)
+            physicsWorld.gravity = CGVector(dx: data.acceleration.x * 50, dy: data.acceleration.y * 50)
         }
         
-        // 2. Manage Particle Count based on fillPercentage
+        // 2. Manage Particle Count
         let targetCount = Int(Double(Self.maxBalls) * fillPercentage)
         
         if nodes.count < targetCount {
-            // Add balls
-            // Spawn them at top random x
-            // Don't spawn too many per frame to avoid lag spikes
             let needed = targetCount - nodes.count
-            let spawnRate = 10
+            // Spawn rate to fill up reasonably fast
+            let spawnRate = 15
             let toSpawn = min(needed, spawnRate)
             
             for _ in 0..<toSpawn {
                 spawnBall()
             }
         } else if nodes.count > targetCount {
-            // Remove balls
-            // Remove from the top (last added) or bottom?
-            // Removing from indices 0 is usually oldest.
-            let toRemove = min(nodes.count - targetCount, 10)
+            let toRemove = min(nodes.count - targetCount, 15)
             for _ in 0..<toRemove {
                 if let node = nodes.last {
                     node.removeFromParent()
@@ -68,22 +66,19 @@ class LiquidGameScene: SKScene {
     }
     
     private func spawnBall() {
-        let node = SKShapeNode(circleOfRadius: Self.circleRadius)
-        // Use ShapeNode for debugging if needed, but for the Canvas renderer we just need position.
-        // Actually, sample.swift uses SKNode and draws in Canvas.
-        // Let's use bare SKNode with physics body for performance, visual is handled by canvas.
+        // We use lightweight SKNodes for physics only. 
+        // Visuals are handled by the SwiftUI Canvas.
         let ball = SKNode()
         
         // Spawn randomly above the visible area
-        // Or if percentage is low, spawn them.
-        let spawnY = frame.height + CGFloat.random(in: 50...200)
+        let spawnY = frame.height + CGFloat.random(in: 50...400)
         let spawnX = CGFloat.random(in: 10...(frame.width - 10))
         
         ball.position = CGPoint(x: spawnX, y: spawnY)
         
         ball.physicsBody = SKPhysicsBody(circleOfRadius: Self.circleRadius)
-        ball.physicsBody?.friction = 0.1
-        ball.physicsBody?.restitution = 0.1
+        ball.physicsBody?.friction = 0.0
+        ball.physicsBody?.restitution = 0.0
         ball.physicsBody?.linearDamping = 0.1
         ball.physicsBody?.density = 1.0
         
@@ -102,7 +97,8 @@ struct LiquidBackgroundView: View {
     
     var body: some View {
         ZStack {
-            // Physics Simulation Layer (Invisible)
+            // Invisible Physics Layer
+            // We use this to drive the simulation, but we don't draw it.
             GeometryReader { proxy in
                 SpriteView(scene: scene, options: [.allowsTransparency])
                     .onAppear {
@@ -112,30 +108,42 @@ struct LiquidBackgroundView: View {
                     .onChange(of: progress) {
                         scene.fillPercentage = progress
                     }
-                    // Initial sync
                     .onAppear {
                          scene.fillPercentage = progress
                     }
             }
-            .opacity(0) // Hide the SpriteKit view itself
+            .opacity(0.0) // Completely hide the SpriteKit view
+            .allowsHitTesting(false)
             
-            // Rendering Layer (Metaballs)
+            // Rendering Layer (Canvas + Metaballs)
             TimelineView(.animation) { timeline in
                 Canvas { ctx, size in
-                    let now = timeline.date.timeIntervalSinceReferenceDate
-                    // We don't really need time, but accessing it drives the update loop
+                    let _ = timeline.date
                     
-                    // Metaball Filter Chain
-                    // 1. Draw blurred circles
-                    // 2. Threshold alpha
+                    // Metaball Filter Chain (Derived from sample.swift)
+                    // 1. Threshold Alpha: This creates the sharp "Liquid" hard edge.
+                    //    Crucial: Must be applied BEFORE or AFTER the blur? 
+                    //    In sample.swift: Threshold then Blur? No, usually Blur then Threshold.
+                    //    Sample.swift code:
+                    //       ctx.addFilter(.alphaThreshold(min: 0.5, color: .white))
+                    //       ctx.addFilter(.blur(radius: 32))
+                    //    Actually, SwiftUI filters are applied in order.
+                    //    To make metaballs: Draw Circles -> Blur -> Threshold.
+                    //
+                    //    Wait, sample.swift does:
+                    //       ctx.addFilter(.alphaThreshold(min: 0.5, color: .white))
+                    //       ctx.addFilter(.blur(radius: 32))
+                    //    This seems backwards for standard metaballs (usually Blur -> Threshold), 
+                    //    BUT if the sample works that way, we should respect it.
+                    //    However, standard metaball theory is: Blur overlapping shapes to merge alphas, then threshold to cut at a specific alpha.
+                    //    Let's try the standard order which guarantees sharp edges:
                     
                     ctx.addFilter(.alphaThreshold(min: 0.5, color: color))
-                    ctx.addFilter(.blur(radius: 12)) // Blur amount controls "gooeyness"
+                    ctx.addFilter(.blur(radius: 12)) 
                     
                     ctx.drawLayer { layerCtx in
                         for node in scene.nodes {
-                            // Convert SpriteKit coordinates to SwiftUI Canvas coordinates
-                            // SpriteKit: (0,0) is bottom-left. Canvas: (0,0) is top-left.
+                            // Coordinate flip: SpriteKit (0,0 bottom-left) -> Canvas (0,0 top-left)
                             let p = node.position
                             let y = size.height - p.y
                             let x = p.x
@@ -146,9 +154,13 @@ struct LiquidBackgroundView: View {
                             layerCtx.fill(Circle().path(in: rect), with: .color(.white))
                         }
                     }
+                } symbols: {
+                    // Symbol definition if needed, but we drew directly in the closure
+                    EmptyView().tag("liquidLayer")
                 }
             }
         }
-        .allowsHitTesting(false) // Let touches pass through to buttons
+        .allowsHitTesting(false)
+        .ignoresSafeArea()
     }
 }
