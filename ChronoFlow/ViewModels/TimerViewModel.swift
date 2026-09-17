@@ -12,7 +12,7 @@ class TimerViewModel: ObservableObject {
     private(set) var totalTime: Double = 30
 
     var currentThemeColor: Color {
-        progress > 0.9 ? .red : (progress > 0.75 ? .orange : .cyan)
+        LiquidTheme.color(for: progress)
     }
 
     /// Wall-clock deadline. Everything is derived from this, so the countdown
@@ -47,6 +47,7 @@ class TimerViewModel: ObservableObject {
         progress = 0
         statusText = "READY"
         cancelCompletionNotification()
+        LiveActivityController.shared.end(showCompleted: false)
     }
 
     // MARK: - Lifecycle
@@ -54,12 +55,14 @@ class TimerViewModel: ObservableObject {
     private func start() {
         guard currentTime > 0.5 else { return }
 
-        endDate = Date().addingTimeInterval(currentTime)
+        let deadline = Date().addingTimeInterval(currentTime)
+        endDate = deadline
         didWarn = false
         isRunning = true
         statusText = "FLOWING"
         HapticManager.shared.playFeedbackTap()
         scheduleCompletionNotification(in: currentTime)
+        LiveActivityController.shared.start(totalTime: totalTime, endDate: deadline)
 
         let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
             self?.tick()
@@ -76,6 +79,7 @@ class TimerViewModel: ObservableObject {
         statusText = "PAUSED"
         HapticManager.shared.playFeedbackTap()
         cancelCompletionNotification()
+        LiveActivityController.shared.update(endDate: nil, remaining: currentTime)
     }
 
     private func complete() {
@@ -85,6 +89,7 @@ class TimerViewModel: ObservableObject {
         progress = 1
         statusText = "COMPLETE"
         HapticManager.shared.playTimeUpSignal()
+        LiveActivityController.shared.end(showCompleted: true)
     }
 
     private var remaining: Double {
