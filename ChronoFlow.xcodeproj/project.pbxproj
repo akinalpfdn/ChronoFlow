@@ -6,19 +6,97 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E21A91CE305B82C8009038E8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21A91CD305B82C8009038E8 /* WidgetKit.framework */; };
+		E21A91D0305B82C8009038E8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21A91CF305B82C8009038E8 /* SwiftUI.framework */; };
+		E21A91DF305B82C9009038E8 /* ChronoFlowWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E21A91CB305B82C8009038E8 /* ChronoFlowWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E21A91DD305B82C9009038E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F4F5C34C2EEDACEE003198A4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E21A91CA305B82C8009038E8;
+			remoteInfo = ChronoFlowWidgetsExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E21A91E4305B82C9009038E8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E21A91DF305B82C9009038E8 /* ChronoFlowWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		E21A91CB305B82C8009038E8 /* ChronoFlowWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChronoFlowWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E21A91CD305B82C8009038E8 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		E21A91CF305B82C8009038E8 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F4F5C3542EEDACEE003198A4 /* ChronoFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChronoFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E21A91E0305B82C9009038E8 /* Exceptions for "ChronoFlowWidgets" folder in "ChronoFlowWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E21A91CA305B82C8009038E8 /* ChronoFlowWidgetsExtension */;
+		};
+		E21A91E8305B839A009038E8 /* Exceptions for "ChronoFlow" folder in "ChronoFlow" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F4F5C3532EEDACEE003198A4 /* ChronoFlow */;
+		};
+		E21A91E9305B839A009038E8 /* Exceptions for "ChronoFlow" folder in "ChronoFlowWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Activities/TimerActivityAttributes.swift,
+			);
+			target = E21A91CA305B82C8009038E8 /* ChronoFlowWidgetsExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		E21A91D1305B82C8009038E8 /* ChronoFlowWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E21A91E0305B82C9009038E8 /* Exceptions for "ChronoFlowWidgets" folder in "ChronoFlowWidgetsExtension" target */,
+			);
+			path = ChronoFlowWidgets;
+			sourceTree = "<group>";
+		};
 		F4F5C3562EEDACEE003198A4 /* ChronoFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E21A91E8305B839A009038E8 /* Exceptions for "ChronoFlow" folder in "ChronoFlow" target */,
+				E21A91E9305B839A009038E8 /* Exceptions for "ChronoFlow" folder in "ChronoFlowWidgetsExtension" target */,
+			);
 			path = ChronoFlow;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E21A91C8305B82C8009038E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21A91D0305B82C8009038E8 /* SwiftUI.framework in Frameworks */,
+				E21A91CE305B82C8009038E8 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4F5C3512EEDACEE003198A4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -29,10 +107,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E21A91CC305B82C8009038E8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E21A91CD305B82C8009038E8 /* WidgetKit.framework */,
+				E21A91CF305B82C8009038E8 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F4F5C34B2EEDACEE003198A4 = {
 			isa = PBXGroup;
 			children = (
 				F4F5C3562EEDACEE003198A4 /* ChronoFlow */,
+				E21A91D1305B82C8009038E8 /* ChronoFlowWidgets */,
+				E21A91CC305B82C8009038E8 /* Frameworks */,
 				F4F5C3552EEDACEE003198A4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				F4F5C3542EEDACEE003198A4 /* ChronoFlow.app */,
+				E21A91CB305B82C8009038E8 /* ChronoFlowWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +138,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E21A91CA305B82C8009038E8 /* ChronoFlowWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E21A91E1305B82C9009038E8 /* Build configuration list for PBXNativeTarget "ChronoFlowWidgetsExtension" */;
+			buildPhases = (
+				E21A91C7305B82C8009038E8 /* Sources */,
+				E21A91C8305B82C8009038E8 /* Frameworks */,
+				E21A91C9305B82C8009038E8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E21A91D1305B82C8009038E8 /* ChronoFlowWidgets */,
+			);
+			name = ChronoFlowWidgetsExtension;
+			packageProductDependencies = (
+			);
+			productName = ChronoFlowWidgetsExtension;
+			productReference = E21A91CB305B82C8009038E8 /* ChronoFlowWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F4F5C3532EEDACEE003198A4 /* ChronoFlow */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4F5C35F2EEDACF0003198A4 /* Build configuration list for PBXNativeTarget "ChronoFlow" */;
@@ -55,10 +167,12 @@
 				F4F5C3502EEDACEE003198A4 /* Sources */,
 				F4F5C3512EEDACEE003198A4 /* Frameworks */,
 				F4F5C3522EEDACEE003198A4 /* Resources */,
+				E21A91E4305B82C9009038E8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E21A91DE305B82C9009038E8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				F4F5C3562EEDACEE003198A4 /* ChronoFlow */,
@@ -77,9 +191,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					E21A91CA305B82C8009038E8 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					F4F5C3532EEDACEE003198A4 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
@@ -100,11 +217,19 @@
 			projectRoot = "";
 			targets = (
 				F4F5C3532EEDACEE003198A4 /* ChronoFlow */,
+				E21A91CA305B82C8009038E8 /* ChronoFlowWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E21A91C9305B82C8009038E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4F5C3522EEDACEE003198A4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +240,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E21A91C7305B82C8009038E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4F5C3502EEDACEE003198A4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +256,77 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		E21A91DE305B82C9009038E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E21A91CA305B82C8009038E8 /* ChronoFlowWidgetsExtension */;
+			targetProxy = E21A91DD305B82C9009038E8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		E21A91E2305B82C9009038E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQ54PPL5VQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChronoFlowWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChronoFlowWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.akinalpfdn.ChronoFlow.ChronoFlowWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E21A91E3305B82C9009038E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQ54PPL5VQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChronoFlowWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChronoFlowWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.akinalpfdn.ChronoFlow.ChronoFlowWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F4F5C35D2EEDACF0003198A4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -184,6 +386,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -241,6 +444,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -256,9 +460,10 @@
 				DEVELOPMENT_TEAM = WQ54PPL5VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = ChronoFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Chrono Flow";
 				INFOPLIST_KEY_NSMotionUsageDescription = "ChronoFlow uses your device's motion to simulate liquid physics.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -290,9 +495,10 @@
 				DEVELOPMENT_TEAM = WQ54PPL5VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = ChronoFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Chrono Flow";
 				INFOPLIST_KEY_NSMotionUsageDescription = "ChronoFlow uses your device's motion to simulate liquid physics.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -317,6 +523,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E21A91E1305B82C9009038E8 /* Build configuration list for PBXNativeTarget "ChronoFlowWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E21A91E2305B82C9009038E8 /* Debug */,
+				E21A91E3305B82C9009038E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F4F5C34F2EEDACEE003198A4 /* Build configuration list for PBXProject "ChronoFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

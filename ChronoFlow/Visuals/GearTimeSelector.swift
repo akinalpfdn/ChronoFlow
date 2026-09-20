@@ -82,14 +82,32 @@ struct SingleGear: View {
     
     @State private var rotation: Double = 0
     @State private var isDragging: Bool = false
+    @State private var lastAngle: Double? // Previous finger angle, for delta tracking
     @State private var lastHapticValue: Int = 0 // Track for haptics
-    
-    // Haptic Feedback
-    private let selectionFeedback = UISelectionFeedbackGenerator()
-    
+
     // Computed property to center the coordinate system for drag math
     private var center: CGPoint {
         CGPoint(x: radius + 30, y: radius + 30)
+    }
+
+    /// Angle of the touch point measured from the gear centre, in degrees.
+    private func angle(to location: CGPoint) -> Double {
+        let vector = CGVector(dx: location.x - center.x, dy: location.y - center.y)
+        return atan2(vector.dy, vector.dx) * 180 / .pi
+    }
+
+    /// Rotation can accumulate past a full turn; map it back into 0..<totalRange.
+    private func wrappedValue(for rotation: Double) -> Double {
+        let raw = (rotation / 360.0) * totalRange
+        let wrapped = raw.truncatingRemainder(dividingBy: totalRange)
+        return wrapped < 0 ? wrapped + totalRange : wrapped
+    }
+
+    /// The angle equivalent to `value` that sits closest to the current rotation,
+    /// so an external update never animates a spurious full spin.
+    private func nearestRotation(for value: Double) -> Double {
+        let target = (value / totalRange) * 360.0
+        return target + ((rotation - target) / 360.0).rounded() * 360.0
     }
     
     // Haptics
@@ -140,28 +158,28 @@ struct SingleGear: View {
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { gesture in
-                    if !isDragging {
+                    let current = angle(to: gesture.location)
+
+                    guard let previous = lastAngle else {
+                        // First touch only establishes a reference: the gear must
+                        // turn by how far the finger travels, not jump to where it landed.
+                        lastAngle = current
                         isDragging = true
                         onInteract(true)
+                        return
                     }
-                    
-                    // Calculate angle from center
-                    let vector = CGVector(dx: gesture.location.x - center.x, dy: gesture.location.y - center.y)
-                    let angle = atan2(vector.dy, vector.dx) * 180 / .pi + 90
-                    
-                    // Normalize to 0-360
-                    var normalizedAngle = angle
-                    if normalizedAngle < 0 { normalizedAngle += 360 }
-                    
-                    // Update visual rotation immediately to track finger
-                    withAnimation(.interactiveSpring) {
-                        rotation = normalizedAngle
-                    }
-                    
-                    // Map to value
-                    let newValue = (normalizedAngle / 360.0) * totalRange
-                    value = min(max(0, newValue), totalRange)
-                    
+
+                    // Shortest signed delta, so crossing the ±180° seam doesn't spin the gear.
+                    var delta = current - previous
+                    if delta > 180 { delta -= 360 }
+                    if delta < -180 { delta += 360 }
+
+                    lastAngle = current
+                    rotation += delta
+
+                    // Wraps freely past 0 and 59 in both directions.
+                    value = wrappedValue(for: rotation)
+
                     // Haptic Feedback Logic
                     let intValue = Int(value)
                     if intValue != lastHapticValue {
@@ -174,14 +192,18 @@ struct SingleGear: View {
                     }
                 }
                 .onEnded { _ in
-                    isDragging = false
-                    onInteract(false)
-                    // Snap logic
+                    // Snap to the nearest tick, keeping any accumulated turns.
                     let snapStep = 360.0 / Double(visibleTicks)
                     let snappedRot = round(rotation / snapStep) * snapStep
+
                     withAnimation(.spring) {
                         rotation = snappedRot
                     }
+                    value = wrappedValue(for: snappedRot)
+
+                    lastAngle = nil
+                    isDragging = false
+                    onInteract(false)
                 }
         )
         .onAppear {
@@ -190,9 +212,8 @@ struct SingleGear: View {
         .onChange(of: value) {
             // Only sync if NOT dragging to avoid feedback loop
             if !isDragging {
-                let targetRot = (value / totalRange) * 360.0
                 withAnimation(.interactiveSpring) {
-                    rotation = targetRot
+                    rotation = nearestRotation(for: value)
                 }
             }
         }

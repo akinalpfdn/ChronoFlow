@@ -1,72 +1,140 @@
 import SwiftUI
 import Combine
+import UserNotifications
+
 class TimerViewModel: ObservableObject {
     @Published var progress: Double = 0.0
-    @Published var timeFormatted: String = "05:00"
     @Published var statusText: String = "READY"
     @Published var isRunning: Bool = false
-    @Published var activeDrops: [LiquidDrop] = []
-    
-    // Required for iOS 26 Glass Morphing
-    @Namespace var namespace
-    
+    @Published var currentTime: Double = 30
+
+    /// The duration the user dialled in. `currentTime` counts down from it.
+    private(set) var totalTime: Double = 30
+
     var currentThemeColor: Color {
-        progress > 0.9 ? .red : (progress > 0.75 ? .orange : .cyan)
+        LiquidTheme.color(for: progress)
     }
-    
-    struct LiquidDrop: Identifiable {
-        let id = UUID(); var x: CGFloat; var y: CGFloat; var size: CGFloat
-    }
-    
+
+    /// Wall-clock deadline. Everything is derived from this, so the countdown
+    /// stays accurate across drift, backgrounding and run-loop stalls.
+    private var endDate: Date?
     private var timer: Timer?
-    var totalTime: Double = 30 // Made internal for binding access
-    @Published var currentTime: Double = 30 // Published for UI binding
-    
-    // Updates formatting when totalTime is manually changed
+    private var didWarn = false
+
+    private let notificationID = "chronoflow.timer.complete"
+    private let warningLeadTime: Double = 10
+
+    // MARK: - Intent
+
+    /// Dialling a new duration is only meaningful while stopped; ignoring it
+    /// while running avoids the totalTime/progress mismatch a live edit causes.
     func updateTotalTime(_ newTime: Double) {
-        totalTime = newTime
-        currentTime = newTime
-        // Recalculate display
-        let m = Int(currentTime) / 60
-        let s = Int(currentTime) % 60
-        timeFormatted = String(format: "%02d:%02d", m, s)
-        progress = 0.0 // Reset progress
+        guard !isRunning else { return }
+        totalTime = max(1, newTime)
+        currentTime = totalTime
+        progress = 0
+        statusText = "READY"
     }
-    
+
     func toggleTimer() {
-        isRunning.toggle()
-        statusText = isRunning ? "FLOWING" : "PAUSED"
-        if isRunning {
-            timer = Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in self.tick() }
-        } else {
-            timer?.invalidate()
-        }
+        isRunning ? pause() : start()
     }
-    
+
     func resetTimer() {
-        isRunning = false; timer?.invalidate(); currentTime = totalTime
-        progress = 0.0; timeFormatted = "05:00"; statusText = "READY"
-        activeDrops.removeAll()
+        stopTicking()
+        isRunning = false
+        currentTime = totalTime
+        progress = 0
+        statusText = "READY"
+        cancelCompletionNotification()
+        LiveActivityController.shared.end(showCompleted: false)
     }
-    
+
+    // MARK: - Lifecycle
+
+    private func start() {
+        guard currentTime > 0.5 else { return }
+
+        let deadline = Date().addingTimeInterval(currentTime)
+        endDate = deadline
+        didWarn = false
+        isRunning = true
+        statusText = "FLOWING"
+        HapticManager.shared.playFeedbackTap()
+        scheduleCompletionNotification(in: currentTime)
+        LiveActivityController.shared.start(totalTime: totalTime, endDate: deadline)
+
+        let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            self?.tick()
+        }
+        // .common keeps the display ticking while a gesture is tracking.
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
+    }
+
+    private func pause() {
+        currentTime = remaining
+        stopTicking()
+        isRunning = false
+        statusText = "PAUSED"
+        HapticManager.shared.playFeedbackTap()
+        cancelCompletionNotification()
+        LiveActivityController.shared.update(endDate: nil, remaining: currentTime)
+    }
+
+    private func complete() {
+        stopTicking()
+        isRunning = false
+        currentTime = 0
+        progress = 1
+        statusText = "COMPLETE"
+        HapticManager.shared.playTimeUpSignal()
+        LiveActivityController.shared.end(showCompleted: true)
+    }
+
+    private var remaining: Double {
+        max(0, endDate?.timeIntervalSinceNow ?? currentTime)
+    }
+
     private func tick() {
-        if currentTime > 0 {
-            currentTime -= 1/60
-            progress = 1.0 - (currentTime / totalTime)
-            
-            let m = Int(currentTime) / 60
-            let s = Int(currentTime) % 60
-            timeFormatted = String(format: "%02d:%02d", m, s)
-            
-            updateDrops()
-        } else {
-            statusText = "COMPLETE"
-            timer?.invalidate()
+        let remaining = self.remaining
+        currentTime = remaining
+        progress = totalTime > 0 ? min(1, 1 - remaining / totalTime) : 0
+
+        if !didWarn, remaining <= warningLeadTime, totalTime > warningLeadTime * 1.5 {
+            didWarn = true
+            HapticManager.shared.playWarningSignal()
+        }
+
+        if remaining <= 0 { complete() }
+    }
+
+    private func stopTicking() {
+        timer?.invalidate()
+        timer = nil
+        endDate = nil
+    }
+
+    // MARK: - Background delivery
+
+    /// Foreground completion is announced by haptics; this covers the case
+    /// where the app is backgrounded or the screen is locked when time runs out.
+    private func scheduleCompletionNotification(in seconds: Double) {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { return }
+
+            let content = UNMutableNotificationContent()
+            content.title = "Time's up"
+            content.body = "Your flow is complete."
+            content.sound = .default
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, seconds), repeats: false)
+            center.add(UNNotificationRequest(identifier: self.notificationID, content: content, trigger: trigger))
         }
     }
-    
-    private func updateDrops() {
-        // Old simulation logic removed.
-        // Physics are now handled by LiquidGameScene in Visuals/LiquidPhysics.swift
+
+    private func cancelCompletionNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationID])
     }
 }
